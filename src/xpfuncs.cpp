@@ -329,13 +329,49 @@ static int XLuaCreateCommand(lua_State * L)
 	return 1;
 }
 
-static void cmd_cb_helper(xlua_cmd * cmd, int phase, float elapsed, void * ref)
+static int cmd_filter_cb_helper(xlua_cmd* cmd, int phase, float elapsed, void* ref)
+{
+	int res = 1;
+
+	lua_State* L = setup_lua_callback(ref);
+	if (L)
+	{
+		int e = lua_pcall(L, 0, 1, module::debug_proc_from_interp(L));
+		if (e != 0)
+		{
+			printf("%s\n", lua_tostring(L, -1));
+			lua_pop(L, -1);
+		}
+		else
+		{
+			res = lua_toboolean(L, -1);
+			lua_pop(L, 1);
+		}
+	}
+
+	return res;
+}
+
+static int cmd_cb_helper(xlua_cmd * cmd, int phase, float elapsed, void * ref)
 {
 	lua_State * L = setup_lua_callback(ref);
 	if(L)
 	{
 		fmt_pcall_stdvars(L,module::debug_proc_from_interp(L),"if",phase, elapsed);
 	}
+
+	return 1;
+}
+
+// XPLMFilterCommand handler
+static int XLuaFilterCommand(lua_State* L)
+{
+	xlua_cmd* cmd = luaL_checkuserdata<xlua_cmd>(L, 1, "expected command");
+	notify_cb_t* cb_filter = wrap_lua_func(L, 2);
+
+	xlua_cmd_install_filter(cmd, cmd_filter_cb_helper, cb_filter);
+
+	return 0;
 }
 
 // XPLMReplaceCommand cmd handler
@@ -461,6 +497,7 @@ static int XLuaReloadOnFlightChange(lua_State* L)
 	FUNC(XLuaCreateCommand) \
 	FUNC(XLuaReplaceCommand) \
 	FUNC(XLuaWrapCommand) \
+	FUNC(XLuaFilterCommand) \
 	FUNC(XLuaCommandStart) \
 	FUNC(XLuaCommandStop) \
 	FUNC(XLuaCommandOnce) \
