@@ -190,7 +190,7 @@ function make_command_obj(in_cmd, in_name)
 			if self.cmd == nil then
 				self.cmd = XLuaFindCommand(self.name)
 				if self.cmd == nil then
-					error("Unable to find command:"..name)
+					error("Unable to find command:"..self.name)
 				end
 			end
 			XLuaCommandStart(self.cmd)
@@ -199,7 +199,7 @@ function make_command_obj(in_cmd, in_name)
 			if self.cmd == nil then
 				self.cmd = XLuaFindCommand(self.name)
 				if self.cmd == nil then
-					error("Unable to find command:"..name)
+					error("Unable to find command:"..self.name)
 				end
 			end
 			XLuaCommandStop(self.cmd)
@@ -208,7 +208,7 @@ function make_command_obj(in_cmd, in_name)
 			if self.cmd == nil then
 				self.cmd = XLuaFindCommand(self.name)
 				if self.cmd == nil then
-					error("Unable to find command:"..name)
+					error("Unable to find command:"..self.name)
 				end
 			end
 			XLuaCommandOnce(self.cmd)
