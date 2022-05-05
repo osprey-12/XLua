@@ -339,7 +339,7 @@ static int cmd_filter_cb_helper(xlua_cmd* cmd, int phase, float elapsed, void* r
 		int e = lua_pcall(L, 0, 1, module::debug_proc_from_interp(L));
 		if (e != 0)
 		{
-			printf("%s\n", lua_tostring(L, -1));
+			l_my_print(L);
 			lua_pop(L, -1);
 		}
 		else
@@ -506,24 +506,30 @@ static int XLuaReloadOnFlightChange(lua_State* L)
 	FUNC(XLuaIsTimerScheduled) \
 	FUNC(XLuaReloadOnFlightChange)
 
+std::string get_log_prefix(void)
+{
+	char prefix[256];
+	float hrs, min, sec, real_time = XPLMGetDataf(drSimRealTime);
+	hrs = (int)(real_time / 3600.0f);
+	min = (int)(real_time / 60.0f) - (int)(hrs * 60.0f);
+	sec = real_time - (hrs * 3600.0f) - (min * 60.0f);
+	sprintf(prefix, "%d:%02d:%06.3f LUA: ", (int)hrs, (int)min, sec);
+
+	return std::string(prefix);
+}
+
 static int l_my_print(lua_State *L)
 {
 	int nargs = lua_gettop(L);
 	module *me = module::module_from_interp(L);
 
-	char prefix[256];
-	float hrs, min, sec, real_time = XPLMGetDataf(drSimRealTime);
-	hrs = (int)(real_time / 3600.0f);
-	min = (int)(real_time / 60.0f) - (int)(hrs * 60.0f);
-	sec = real_time-(hrs * 3600.0f) - (min * 60.0f);
-	sprintf(prefix, "%d:%02d:%06.3f LUA: ", (int)hrs, (int)min, sec);
+	std::string prefix = get_log_prefix();
 
 	// Unwieldy... but on the other hand, lua debug statements could in theory come from anywhere, from
 	// several different instances of xlua at the same time so the full path probably is needed.
-	std::string output = prefix + me->get_log_path() + "\n";
-	XPLMDebugString(output.c_str());
-	output.clear();
+	XPLMDebugString((prefix + me->get_log_path() + "\n").c_str());
 
+	std::string output;
 	char num_buf[128];
 
 	for (int i = 1; i <= nargs; i++)
@@ -563,8 +569,7 @@ static int l_my_print(lua_State *L)
 	puts(output.c_str());
 
 	output += "\n";
-	XPLMDebugString(prefix);
-	XPLMDebugString(output.c_str());
+	XPLMDebugString((prefix + output).c_str());
 
 	return 0;
 }

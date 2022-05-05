@@ -11,12 +11,15 @@
 #ifndef xpfuncs_h
 #define xpfuncs_h
 
+#include <string>
+
 extern "C" {
 #include <lua.h>
 #include <lauxlib.h>
 };
 
 void	add_xpfuncs_to_interp(lua_State * interp);
+std::string get_log_prefix(void);
 
 void InitScripts(void);
 void CleanupScripts(void);

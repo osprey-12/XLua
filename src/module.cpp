@@ -104,9 +104,11 @@ static void destroy_alloc_block(module_alloc_block * head)
 
 #define CTOR_FAIL(errcode,msg) \
 if(errcode != 0) { \
-	const char * s = lua_tostring(m_interp, -1); \
-	printf("%s\n%s failed: %d\n",s,msg,errcode); \
-	XPLMDebugString(msg); \
+	const char *errmsg = lua_tostring(m_interp, -1); \
+	printf("%s\n%s failed: %d\n",errmsg,msg,errcode); \
+	std::string prefix = get_log_prefix(); \
+	XPLMDebugString((prefix + "Error during " + msg + " '" + m_log_path + "'\n").c_str()); \
+	XPLMDebugString((prefix + errmsg + "\n").c_str()); \
 	lua_close(m_interp); \
 	m_interp = NULL; \
 	return; }
@@ -135,7 +137,7 @@ module::module(
 	luaL_openlibs(m_interp);
 
 	lua_pushlightuserdata(m_interp, this);
-	lua_setglobal(m_interp, "__module_ptr");		
+	lua_setglobal(m_interp, "__module_ptr");
 		
 	add_xpfuncs_to_interp(m_interp);
 	
