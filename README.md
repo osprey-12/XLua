@@ -171,7 +171,7 @@ function command_handler(phase, duration)
 end
 ```
 
-The `phase` is an integer that will be `0` (start) when the command is first pressed, `1` (continue) while it is being held down, and `2` (stop) when it is released.  For any command invocation, you are guaranteed exactly one "start" and one "stop", with one or more "continue" in the middle if the command is "held down". But note that if the user has multiple joysticks mapped to the command you could get a second "continue" while the first one is running.
+The `phase` is an integer that will be `0` (start) when the command is first pressed, `1` (continue) while it is being held down, and `2` (stop) when it is released.  For any command invocation, you are guaranteed exactly one "start" and one "stop", with one or more "continue" in the middle if the command is "held down". But note that if the user has multiple joysticks mapped to the command you could get a second "start" while the first one is running.
 
 The `duration` is how long the command has been held down in seconds, starting at 0.
 
