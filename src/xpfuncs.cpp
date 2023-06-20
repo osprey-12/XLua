@@ -16,7 +16,6 @@
 #include "xpcommands.h"
 #include "xptimers.h"
 #include "module.h"
-#include "XPLMPlanes.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -438,17 +437,6 @@ static int XLuaReloadOnFlightChange(lua_State* L)
 	return 0;
 }
 
-static int XLuaReturnPath(lua_State* L)
-{
-	char fileName[256];
-	char filePath[512];
-
-	XPLMGetNthAircraftModel(0, fileName, filePath);
-
-	lua_pushstring(L, filePath);
-	return 1;
-}
-
 #define FUNC_LIST \
 	FUNC(XLuaGetCode) \
 	FUNC(XLuaFindDataRef) \
@@ -470,9 +458,7 @@ static int XLuaReturnPath(lua_State* L)
 	FUNC(XLuaCreateTimer) \
 	FUNC(XLuaRunTimer) \
 	FUNC(XLuaIsTimerScheduled) \
-	FUNC(XLuaReloadOnFlightChange) \
-	FUNC(XLuaDebugString) \
-	FUNC(XLuaReturnPath)
+	FUNC(XLuaReloadOnFlightChange)
 
 static int l_my_print(lua_State *L)
 {
